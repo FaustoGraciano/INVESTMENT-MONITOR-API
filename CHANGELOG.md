@@ -15,6 +15,13 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 - **Validación de datos**: Schemas con Pydantic para validación automática de requests/responses
 - **Documentación automática**: Swagger UI en `/docs` y ReDoc en `/redoc`
 
+### 🐛 Fixed (Correcciones)
+
+- **Validación de tickers flexible**: Corrección en la detección de ETFs y criptomonedas
+  - Problema: Solo funcionaba con acciones (AAPL, TSLA) que tienen campo `currentPrice`
+  - Solución: Busca precio en múltiples campos (`currentPrice`, `regularMarketPrice`, `previousClose`, `bid`)
+  - Ahora soporta: Acciones, ETFs (SPY, QQQ), Criptomonedas (BTC-USD, ETH-USD)
+
 ### 🏗️ Architecture (Estructura técnica)
 
 - **Separación de responsabilidades**: Arquitectura modular con capas:
