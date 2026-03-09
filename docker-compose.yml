@@ -1,0 +1,52 @@
+
+
+version: '3.8'  # Especifica la versión de Docker Compose
+
+services:       #Lista de contenedores a levantar
+
+    postgres:     #Contenedor 1: Base de datos PostgreSQL
+      #Defino imagen de docker para PostgreSQL
+      image: postgres:15-alpine
+      container_name: investment_postgres
+
+      #Defino variables de entorno para configurar PostgreSQL
+      environment:                
+        POSTGRES_USER: 'investment_user'
+        POSTGRES_PASSWORD: 'dev_password_123'
+        POSTGRES_DB: 'investment_db'
+
+      #Mapeo puerto del contenedor al puerto local, asi API puede conectarse a la DB
+      #puerto_en_pc:puerto_contenedor
+      #con guion medio por que espera una lista.
+      ports: 
+      - "5432:5432"
+
+      #Para que los datos no se borren cuando se apaga el contenedor
+      volumes:  
+        - postgres_data:/var/lib/postgresql/data
+      
+      #Reinicia automaticamente si el contenedor falla
+      restart: unless-stopped
+      
+    pgadmin:     #Contenedor 2: pgAdmin para administrar la base de datos
+      image: dpage/pgadmin4:latest
+      container_name: investment_pgadmin
+
+      environment:
+        PGADMIN_DEFAULT_EMAIL: 'admin@admin.com'
+        PGADMIN_DEFAULT_PASSWORD: 'admin'
+      
+      #De mi puerto 5050 accedo al 80 del servicio pgAdmin
+      ports: 
+      - "5050:80"
+      
+      #Espera a que postgres este listo antes de iniciar
+      depends_on:
+        - postgres
+      
+      restart: unless-stopped
+
+# Definición de volúmenes persistentes
+volumes:
+  postgres_data:
+    driver: local 

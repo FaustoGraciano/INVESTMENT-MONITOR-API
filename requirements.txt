@@ -7,10 +7,22 @@ pydantic==2.5.3
 pydantic-settings==2.1.0
 
 # Financial Data
-yfinance==0.2.36
+yfinance>=0.2.36
 
 # HTTP Client
 httpx==0.26.0
 
 # Development Tools
 python-dotenv==1.0.1
+
+#Database
+sqlalchemy==2.0.25
+
+#Driver async para PostgreSQL (usado por FastAPI)
+asyncpg==0.29.0
+
+#Driver sync para PostgreSQL (usado por Alembic)
+psycopg2-binary==2.9.9
+
+#Migraciones de base de datos
+alembic==1.13.1

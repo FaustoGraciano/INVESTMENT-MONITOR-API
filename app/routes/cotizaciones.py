@@ -4,14 +4,32 @@ from app.schemas.cotizaciones import CotizacionResponse
 #Importamos función para obtener cotización      
 from app.services.finance_service import obtener_cotizacion
 
+#Importo funciones para guardar cotizacion en DB.
+from app.services.db_service import guardar_cotizacion
+from app.database import get_db
+from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import Depends
+
 #Para agrupar endpoints relacionados
 router = APIRouter()
 
 # Endpoint para obtener cotización de un activo financiero por su ticker
 @router.get("/cotizaciones/{ticker}", response_model=CotizacionResponse)
-def get_cotizaciones(ticker: str):
+async def get_cotizaciones(ticker: str, db: AsyncSession = Depends(get_db)):
+    
+    """
+    Obtiene la cotización actual de un activo financiero y la guarda en DB.
+    
+    Args:
+        ticker: Símbolo del activo (ej: AAPL, TSLA, SPY, BTC-USD)
+        db: Sesión de base de datos (inyectada automáticamente)
+        
+    Returns:
+        Datos de cotización con precio actual, moneda y timestamp
+    """ 
     try:
         data = obtener_cotizacion(ticker)
+        await guardar_cotizacion(db , data)
         return data
     except ValueError as e:
         # Error específico cuando el ticker no existe
@@ -25,3 +43,24 @@ def get_cotizaciones(ticker: str):
             status_code=500, 
             detail=f"Error al obtener cotización: {str(e)}"
         )
+        
+        
+#endpoint temporal para probar conexion con DB        
+@router.get("/cotizaciones/test/{ticker}")
+async def test_guardar(ticker: str, db: AsyncSession = Depends(get_db)):
+    """Endpoint de prueba para guardar sin llamar a Yahoo Finance"""
+    from datetime import datetime
+    
+    # Datos simulados
+    data = {
+        "ticker": ticker.upper(),
+        "nombre": f"Test {ticker.upper()} Inc.",
+        "precio_actual": 123.45,
+        "moneda": "USD",
+        "fecha_consulta": datetime.now()
+    }
+    
+    # Guardar en DB
+    await guardar_cotizacion(db, data)
+    
+    return data
