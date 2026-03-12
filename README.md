@@ -38,6 +38,11 @@ app/
 - [x] Integración con Yahoo Finance
 - [x] Base de datos PostgreSQL
 - [x] Dockerización
+- [x] Endpoint de histórico por ticker (`/historico/{ticker}`)
+- [ ] Cálculo de rendimientos históricos
+- [ ] Worker automático para consulta periódica de precios
+- [ ] APScheduler para tareas programadas
+- [ ] Logs estructurados
 - [ ] Deploy en producción
 
 ## 📌 Endpoints Disponibles
