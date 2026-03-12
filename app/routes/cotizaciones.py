@@ -10,6 +10,10 @@ from app.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends
 
+#Importo funciones para obtener historial de cotizaciones desde DB
+from app.services.db_service import obtener_historial_db
+from app.schemas.cotizaciones import HistoricoResponse
+
 #Para agrupar endpoints relacionados
 router = APIRouter()
 
@@ -45,10 +49,11 @@ async def get_cotizaciones(ticker: str, db: AsyncSession = Depends(get_db)):
         )
         
         
-#endpoint temporal para probar conexion con DB        
+                
+"""#endpoint temporal para probar conexion con DB        
 @router.get("/cotizaciones/test/{ticker}")
 async def test_guardar(ticker: str, db: AsyncSession = Depends(get_db)):
-    """Endpoint de prueba para guardar sin llamar a Yahoo Finance"""
+    #Endpoint de prueba para guardar sin llamar a Yahoo Finance
     from datetime import datetime
     
     # Datos simulados
@@ -64,3 +69,16 @@ async def test_guardar(ticker: str, db: AsyncSession = Depends(get_db)):
     await guardar_cotizacion(db, data)
     
     return data
+"""
+
+@router.get("/historico/{ticker}", response_model= HistoricoResponse )
+async def get_historico(ticker: str, db: AsyncSession = Depends(get_db)):
+    
+    data= await obtener_historial_db(ticker,db)
+    
+    return HistoricoResponse(
+        ticker= ticker.upper(),
+        total_registros= len(data),
+        datos= data
+    )
+    
