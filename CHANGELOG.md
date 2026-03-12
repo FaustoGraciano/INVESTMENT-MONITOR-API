@@ -60,13 +60,31 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ## [Unreleased] - Próximos Sprints
 
+### ✨ Added (Sprint 2 - Persistencia de Datos)
+
+- **Integración con PostgreSQL**: Persistencia real de cotizaciones consultadas.
+- **Modelo `Cotizacion` con SQLAlchemy**: Estructura de tabla para almacenar histórico de precios.
+- **Migraciones con Alembic**: Versionado de esquema de base de datos.
+- **Endpoint `/historico/{ticker}`**: Consulta del historial de cotizaciones para un ticker específico.
+- **Schema `HistoricoResponse`**: Respuesta estructurada con `ticker`, `total_registros` y `datos`.
+
+### 🏗️ Architecture (Sprint 2)
+
+- **Servicio de base de datos**: Separación de lógica de persistencia y consulta en `db_service`.
+- **Persistencia automática**: Cada consulta de `/cotizaciones/{ticker}` se guarda en PostgreSQL.
+- **Consulta histórica ordenada**: Historial devuelto por fecha de consulta descendente (más reciente primero).
+
+### 🐛 Fixed
+
+- **Compatibilidad de yfinance**: Actualización de dependencia para mitigar errores de consulta (429 / invalid crumb).
+
 ### 🚧 Planned (Planeado para futuras versiones)
 
 #### Sprint 2 - Persistencia de Datos
-- [ ] Integración con PostgreSQL
-- [ ] Modelos de base de datos con SQLAlchemy
-- [ ] Migraciones con Alembic
-- [ ] Endpoints para histórico de cotizaciones
+- [x] Integración con PostgreSQL
+- [x] Modelos de base de datos con SQLAlchemy
+- [x] Migraciones con Alembic
+- [x] Endpoints para histórico de cotizaciones
 - [ ] Cálculo de rendimientos históricos
 
 #### Sprint 3 - Automatización

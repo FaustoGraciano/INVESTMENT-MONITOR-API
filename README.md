@@ -34,11 +34,17 @@ app/
 ## 🚀 Estado del Desarrollo
 
 - [x] Estructura del proyecto
-- [ ] API básica con FastAPI
-- [ ] Integración con Yahoo Finance
-- [ ] Base de datos PostgreSQL
-- [ ] Dockerización
+- [x] API básica con FastAPI
+- [x] Integración con Yahoo Finance
+- [x] Base de datos PostgreSQL
+- [x] Dockerización
 - [ ] Deploy en producción
+
+## 📌 Endpoints Disponibles
+
+- **GET /health**: Verifica el estado de la API
+- **GET /cotizaciones/{ticker}**: Consulta la cotización actual y la persiste en PostgreSQL
+- **GET /historico/{ticker}**: Devuelve el historial de cotizaciones guardadas para un ticker
 
 ## 👨‍💻 Autor
 
@@ -48,4 +54,4 @@ Estudiante de Ingeniería en Computación
 
 ---
 
-*Proyecto en desarrollo activo - Febrero 2026*
+*Proyecto en desarrollo activo - Marzo 2026*
