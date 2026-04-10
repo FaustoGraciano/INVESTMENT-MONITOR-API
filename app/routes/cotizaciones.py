@@ -1,18 +1,16 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 #Importamos modelo de respuesta que FastAPI valida
-from app.schemas.cotizaciones import CotizacionResponse
+from app.schemas.cotizaciones import CotizacionResponse, RendimientoResponse, HistoricoResponse
 #Importamos función para obtener cotización      
-from app.services.finance_service import obtener_cotizacion
+from app.services.finance_service import obtener_cotizacion, calcular_rendimiento, obtener_precios_periodo
 
 #Importo funciones para guardar cotizacion en DB.
-from app.services.db_service import guardar_cotizacion
+from app.services.db_service import guardar_cotizacion, obtener_historial_db, obtener_cotizaciones_intervalo_db
 from app.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import Depends
 
-#Importo funciones para obtener historial de cotizaciones desde DB
-from app.services.db_service import obtener_historial_db
-from app.schemas.cotizaciones import HistoricoResponse
+from datetime import datetime, date
+
 
 #Para agrupar endpoints relacionados
 router = APIRouter()
@@ -81,4 +79,51 @@ async def get_historico(ticker: str, db: AsyncSession = Depends(get_db)):
         total_registros= len(data),
         datos= data
     )
+
+
+@router.get("/rendimiento/{ticker}", response_model = RendimientoResponse)
+async def get_rendimiento(ticker: str, fecha_desde:date, fecha_hasta: date, db: AsyncSession = Depends(get_db)):
     
+    if (fecha_desde > fecha_hasta):
+        raise HTTPException(
+            status_code=400,
+            detail="La fecha de inicio debe ser anterior a la fecha de fin."
+        )
+
+    # Convertimos a limites datetime para incluir todo el rango de dias en la consulta SQL.
+    fecha_desde_dt = datetime.combine(fecha_desde, datetime.min.time())
+    fecha_hasta_dt = datetime.combine(fecha_hasta, datetime.max.time())
+    
+    try:
+        #Obtenemos cotizaciones del intervalo solicitado desde la DB, ordenadas por fecha ascendente (mas antigua primero)
+        registros= await obtener_cotizaciones_intervalo_db(ticker, fecha_desde_dt, fecha_hasta_dt, db)
+        tot_registros=len(registros)
+        
+        if tot_registros >= 2:
+            precio_inicial= registros[0].precio_actual
+            precio_final= registros[-1].precio_actual
+        else:
+            precio_inicial, precio_final = obtener_precios_periodo(ticker, fecha_desde, fecha_hasta)
+
+        rendimiento= calcular_rendimiento(precio_inicial, precio_final)
+        
+        return RendimientoResponse(
+            ticker= ticker.upper(),
+            fecha_desde= fecha_desde,
+            fecha_hasta= fecha_hasta,
+            precio_inicial= precio_inicial,
+            precio_final= precio_final,
+            rendimiento_pct= rendimiento,
+            total_registros= tot_registros)
+    
+    except ValueError as e:
+        raise HTTPException(
+            status_code=404,
+            detail=str(e)
+        )
+    
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error al calcular rendimiento: {str(e)}"
+        )    

@@ -39,7 +39,7 @@ app/
 - [x] Base de datos PostgreSQL
 - [x] Dockerización
 - [x] Endpoint de histórico por ticker (`/historico/{ticker}`)
-- [ ] Cálculo de rendimientos históricos
+- [x] Cálculo de rendimiento simple porcentual por intervalo (`/rendimiento/{ticker}`)
 - [ ] Worker automático para consulta periódica de precios
 - [ ] APScheduler para tareas programadas
 - [ ] Logs estructurados
@@ -50,6 +50,9 @@ app/
 - **GET /health**: Verifica el estado de la API
 - **GET /cotizaciones/{ticker}**: Consulta la cotización actual y la persiste en PostgreSQL
 - **GET /historico/{ticker}**: Devuelve el historial de cotizaciones guardadas para un ticker
+- **GET /rendimiento/{ticker}?fecha_desde=YYYY-MM-DD&fecha_hasta=YYYY-MM-DD**: Calcula rendimiento simple porcentual en el intervalo
+	- Usa DB cuando hay suficientes registros históricos
+	- Si no hay suficientes registros, usa Yahoo Finance como fallback
 
 ## 👨‍💻 Autor
 

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from datetime import datetime
+from datetime import datetime, date
 
 #Definimos como se muestra en dato en respuesta a la consulta de cotizaciones
 class CotizacionResponse(BaseModel):
@@ -18,4 +18,12 @@ class HistoricoResponse(BaseModel):
     ticker: str
     total_registros: int
     datos: list[CotizacionResponse]
-    
+
+class RendimientoResponse(BaseModel):
+    ticker:str
+    fecha_desde:date
+    fecha_hasta:date
+    precio_inicial:float
+    precio_final:float
+    rendimiento_pct:float
+    total_registros:int  

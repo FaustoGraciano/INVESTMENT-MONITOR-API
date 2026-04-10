@@ -67,16 +67,21 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 - **Migraciones con Alembic**: Versionado de esquema de base de datos.
 - **Endpoint `/historico/{ticker}`**: Consulta del historial de cotizaciones para un ticker específico.
 - **Schema `HistoricoResponse`**: Respuesta estructurada con `ticker`, `total_registros` y `datos`.
+- **Endpoint `/rendimiento/{ticker}`**: Cálculo de rendimiento simple porcentual por intervalo (`fecha_desde`, `fecha_hasta`).
+- **Schema `RendimientoResponse`**: Respuesta con precio inicial/final, rendimiento y total de registros considerados.
 
 ### 🏗️ Architecture (Sprint 2)
 
 - **Servicio de base de datos**: Separación de lógica de persistencia y consulta en `db_service`.
 - **Persistencia automática**: Cada consulta de `/cotizaciones/{ticker}` se guarda en PostgreSQL.
 - **Consulta histórica ordenada**: Historial devuelto por fecha de consulta descendente (más reciente primero).
+- **Consulta por intervalo temporal**: Soporte de recuperación de cotizaciones para rangos de fechas en DB.
+- **Fallback híbrido para rendimiento**: Si no hay datos suficientes en DB, se consulta Yahoo Finance.
 
 ### 🐛 Fixed
 
 - **Compatibilidad de yfinance**: Actualización de dependencia para mitigar errores de consulta (429 / invalid crumb).
+- **Validación de fechas en respuesta de rendimiento**: Corrección de tipos `date`/`datetime` para evitar errores de serialización en FastAPI/Pydantic.
 
 ### 🚧 Planned (Planeado para futuras versiones)
 
@@ -85,7 +90,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 - [x] Modelos de base de datos con SQLAlchemy
 - [x] Migraciones con Alembic
 - [x] Endpoints para histórico de cotizaciones
-- [ ] Cálculo de rendimientos históricos
+- [x] Cálculo de rendimientos históricos
 
 #### Sprint 3 - Automatización
 - [ ] Worker automático para consulta periódica de precios

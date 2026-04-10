@@ -3,6 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.cotizacion import Cotizacion
 from sqlalchemy.future import select
 
+from datetime import datetime, date
+
 async def guardar_cotizacion(db: AsyncSession, data: dict) -> Cotizacion:
     """
         Funcion asincrona para guardar una cotizacion en la DB
@@ -60,4 +62,27 @@ async def obtener_historial_db(ticker: str, db: AsyncSession, limite: int = 100)
     return lista
     
     
-     
+async def obtener_cotizaciones_intervalo_db(ticker:str, fecha_desde: date, fecha_hasta:date, db: AsyncSession) -> list:
+    """
+    Obtiene cotizaciones de un ticker dentro de un intervalo [fecha_desde, fecha_hasta],
+    ordenadas de la mas antigua a la mas reciente. 
+    
+    Args:
+        ticker: Simbolo del activo (ej: AAPL, TSLA, SPY, BTC-USD)
+        fecha_desde: Fecha inicial del intervalo (formato 'YYYY-MM-DD')
+        fecha_hasta: Fecha final del intervalo (formato 'YYYY-MM-DD')
+        db: Sesion de DB asincrona
+    Returns:
+        Lista de objetos Cotizacion dentro del intervalo especificado"""
+    
+    #Realizo query para DB con filtro por ticker y rango de fechas, ordenado por fecha de consulta ascendente (mas antigua primero)
+    query= select(Cotizacion).where(
+        Cotizacion.ticker == ticker.upper(),
+        Cotizacion.fecha_consulta >= fecha_desde, 
+        Cotizacion.fecha_consulta <= fecha_hasta
+        ).order_by(Cotizacion.fecha_consulta.asc())
+    
+    result= await db.execute(query)
+    
+    #devolvemos lista con todos los objetos encontrados
+    return result.scalars().all()    
